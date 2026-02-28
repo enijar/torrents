@@ -12,7 +12,8 @@ try {
     console.error("Command not found");
     process.exit(1);
   }
-  await exec();
+  const args = process.argv.slice(3);
+  await exec(...args);
   process.exit(0);
 } catch (err) {
   console.log(err);
