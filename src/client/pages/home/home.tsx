@@ -5,6 +5,7 @@ import * as Style from "client/pages/home/home.style.js";
 interface Torrent {
   hash: string;
   quality: string;
+  videoCodec: string;
   size: number;
   seeds: number;
 }
@@ -50,7 +51,9 @@ const QUALITY_RANK: Record<string, number> = {
 
 function bestTorrentHash(torrents: Torrent[]): string | undefined {
   if (torrents.length === 0) return undefined;
-  return torrents.reduce((best, t) =>
+  const playable = torrents.filter((t) => t.videoCodec !== "x265");
+  const pool = playable.length > 0 ? playable : torrents;
+  return pool.reduce((best, t) =>
     (QUALITY_RANK[t.quality] ?? -1) > (QUALITY_RANK[best.quality] ?? -1) ? t : best
   ).hash;
 }

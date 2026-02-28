@@ -41,7 +41,10 @@ app.get("/api/watch/:hash", (c) => {
     const meta = metadata as { name: string; files: TorrentFile[] } | null;
     const files = meta?.files ?? [];
 
-    const videoFile = files.find((f) => VIDEO_EXTENSIONS.test(f.name));
+    const BROWSER_VIDEO = /\.(mp4|webm)$/i;
+    const videoFile =
+      files.find((f) => BROWSER_VIDEO.test(f.name)) ??
+      files.find((f) => VIDEO_EXTENSIONS.test(f.name));
 
     const subtitleFiles = files.filter((f) => SUBTITLE_EXTENSIONS.test(f.name));
     const subtitleFile = subtitleFiles.find((f) => SUBTITLE_ENGLISH.test(f.name)) ?? subtitleFiles[0] ?? null;

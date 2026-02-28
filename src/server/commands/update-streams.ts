@@ -10,6 +10,7 @@ import {
 const TorrentSchema = z.object({
   hash: z.string(),
   quality: z.string(),
+  video_codec: z.string().optional(),
   size_bytes: z.number(),
   seeds: z.number(),
 });
@@ -138,6 +139,7 @@ async function processMovies(
       torrents: movie.torrents.map((t) => ({
         hash: t.hash,
         quality: t.quality,
+        videoCodec: t.video_codec ?? "x264",
         size: t.size_bytes,
         seeds: t.seeds,
       })),

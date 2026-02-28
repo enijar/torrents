@@ -19,6 +19,7 @@ import {
 interface TorrentData {
   hash: string;
   quality: string;
+  videoCodec: string;
   size: number;
   seeds: number;
 }

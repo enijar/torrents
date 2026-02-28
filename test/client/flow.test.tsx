@@ -16,8 +16,8 @@ const mockStreams = [
     largeCoverImage: "https://yts.bz/assets/images/movies/flow.jpg",
     posterImage: null,
     torrents: [
-      { hash: "low-quality", quality: "720p", size: 1000, seeds: 50 },
-      { hash: "best-quality", quality: "1080p", size: 2000, seeds: 30 },
+      { hash: "low-quality", quality: "720p", videoCodec: "x264", size: 1000, seeds: 50 },
+      { hash: "best-quality", quality: "1080p", videoCodec: "x264", size: 2000, seeds: 30 },
     ],
   },
 ];

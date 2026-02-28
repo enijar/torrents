@@ -1,4 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+let mockFiles = [
+  { name: "test.mp4", path: "Test Movie/test.mp4" },
+  { name: "english.srt", path: "Test Movie/english.srt" },
+];
 
 vi.mock("server/services/torrent-service.js", () => {
   return {
@@ -18,10 +23,7 @@ vi.mock("server/services/torrent-service.js", () => {
 
         emit("metadata", {
           name: "Test Movie",
-          files: [
-            { name: "test.mp4", path: "Test Movie/test.mp4" },
-            { name: "english.srt", path: "Test Movie/english.srt" },
-          ],
+          files: mockFiles,
         });
 
         emit("progress", { progress: 50, speed: "1.00 MB/s", peers: 5 });
@@ -51,6 +53,13 @@ function parseSSE(text: string) {
 }
 
 describe("GET /api/watch/:hash", () => {
+  beforeEach(() => {
+    mockFiles = [
+      { name: "test.mp4", path: "Test Movie/test.mp4" },
+      { name: "english.srt", path: "Test Movie/english.srt" },
+    ];
+  });
+
   it("streams metadata, progress, and done SSE events", async () => {
     const res = await app.request("/api/watch/abc123");
     expect(res.status).toBe(200);
@@ -79,5 +88,34 @@ describe("GET /api/watch/:hash", () => {
     const doneData = done!.data as { videoUrl: string; subtitleUrl: string };
     expect(doneData.videoUrl).toBe("/api/files/Test%20Movie/test.mp4");
     expect(doneData.subtitleUrl).toBe("/api/files/Test%20Movie/english.srt");
+  });
+
+  it("prefers .mp4 over .mkv when both are present", async () => {
+    mockFiles = [
+      { name: "movie.mkv", path: "Test Movie/movie.mkv" },
+      { name: "movie.mp4", path: "Test Movie/movie.mp4" },
+    ];
+
+    const res = await app.request("/api/watch/abc123");
+    const text = await res.text();
+    const events = parseSSE(text);
+
+    const done = events.find((e) => e.event === "done");
+    const doneData = done!.data as { videoUrl: string; subtitleUrl: string | null };
+    expect(doneData.videoUrl).toBe("/api/files/Test%20Movie/movie.mp4");
+  });
+
+  it("falls back to .mkv when no .mp4 or .webm exists", async () => {
+    mockFiles = [
+      { name: "movie.mkv", path: "Test Movie/movie.mkv" },
+    ];
+
+    const res = await app.request("/api/watch/abc123");
+    const text = await res.text();
+    const events = parseSSE(text);
+
+    const done = events.find((e) => e.event === "done");
+    const doneData = done!.data as { videoUrl: string; subtitleUrl: string | null };
+    expect(doneData.videoUrl).toBe("/api/files/Test%20Movie/movie.mkv");
   });
 });
