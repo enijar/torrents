@@ -69,22 +69,31 @@ function posterSrc(largeCoverImage: string): string {
 
 export default function Home() {
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 300);
+  const debouncedSearch = useDebounce(search, 100);
   const [streams, setStreams] = useState<Stream[]>([]);
   const [offset, setOffset] = useState<number | null>(0);
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const fetchStreams = useCallback(
     async (currentOffset: number, replace: boolean) => {
+      if (replace) {
+        abortRef.current?.abort();
+        abortRef.current = new AbortController();
+      }
+      const signal = abortRef.current?.signal;
       setLoading(true);
       try {
         const params = new URLSearchParams({ offset: String(currentOffset) });
         if (debouncedSearch) params.set("search", debouncedSearch);
-        const res = await fetch(`/api/streams?${params}`);
+        const res = await fetch(`/api/streams?${params}`, { signal });
         const data = await res.json();
         setStreams((prev) => (replace ? data.streams : [...prev, ...data.streams]));
         setOffset(data.offset);
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        throw err;
       } finally {
         setLoading(false);
       }
@@ -93,7 +102,6 @@ export default function Home() {
   );
 
   useEffect(() => {
-    setStreams([]);
     setOffset(0);
     fetchStreams(0, true);
   }, [debouncedSearch]);
@@ -126,8 +134,8 @@ export default function Home() {
         />
       </Style.SearchWrapper>
       <Style.Grid>
-        {streams.map((stream) => (
-          <Style.Card key={stream.uuid}>
+        {streams.map((stream, index) => (
+          <Style.Card key={index}>
             <Link to={`/watch/${bestTorrentHash(stream.torrents)}`}>
               <Style.Poster src={stream.posterImage ?? posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
               <Style.CardInfo>

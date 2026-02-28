@@ -57,8 +57,8 @@ export default function Watch() {
           <div>
             <h3>Files</h3>
             <ul>
-              {metadata.files.map((file) => (
-                <li key={file.path}>{file.name}</li>
+              {metadata.files.map((file, index) => (
+                <li key={index}>{file.name}</li>
               ))}
             </ul>
           </div>
