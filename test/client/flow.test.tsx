@@ -1,7 +1,7 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { userEvent } from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import Home from "client/pages/home/home.js";
 import Watch from "client/pages/watch/watch.js";
