@@ -20,7 +20,7 @@ interface CachedFile {
   path: string;
 }
 
-@Table({ tableName: "cached_streams", timestamps: false })
+@Table({ tableName: "cachedStreams", timestamps: false })
 export default class CachedStream extends Model<
   InferAttributes<CachedStream>,
   InferCreationAttributes<CachedStream>
