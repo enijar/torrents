@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+node_modules/
+build/
+.DS_Store
+.env.keys
+.env.local
+tsconfig.tsbuildinfo
+database.sqlite

@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "NodeNext",
+    "outDir": "build",
+    "tsBuildInfoFile": "build/server/.tsbuildinfo",
+    "declaration": false
+  },
+  "exclude": ["src/client"]
+}
