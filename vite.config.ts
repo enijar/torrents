@@ -16,9 +16,6 @@ export default function (): UserConfig {
         "/api": {
           target: SERVER_URL,
         },
-        "/trpc": {
-          target: SERVER_URL,
-        },
       },
     },
     base: config.BASE_PATH,

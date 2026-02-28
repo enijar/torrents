@@ -23,13 +23,12 @@ const config = z
     APP_URL: z.url().nonempty(),
     DATABASE_DIALECT: z.enum(["sqlite3", "mysql"]),
     DATABASE_URL: z.string().nonempty(),
-    JWT_SECRET: z
-      .string()
-      .nonempty()
-      .transform((arg) => new TextEncoder().encode(arg)),
-    EMAIL_FROM: z.email().nonempty(),
-    EMAIL_SMTP_API_KEY: z.string().nonempty(),
     BASE_PATH: z.string().nonempty(),
+    TMDB_API_KEY: z.string().nonempty(),
+    PROXY_HOST: z.string().nonempty(),
+    PROXY_PORT: z.coerce.number(),
+    PROXY_USERNAME: z.string().nonempty(),
+    PROXY_PASSWORD: z.string().nonempty(),
   })
   .parse({ ...env, ...process.env });
 
