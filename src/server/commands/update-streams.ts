@@ -125,7 +125,6 @@ async function processMovies(
 
     await Stream.upsert({
       apiId: movie.id,
-      tmdbId: tmdb?.id ?? null,
       popularity: tmdb?.popularity ?? 0,
       title: movie.title,
       year: movie.year,

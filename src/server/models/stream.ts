@@ -49,9 +49,6 @@ export default class Stream extends Model<
   @Unique
   declare apiId: number;
 
-  @Attribute(DataTypes.INTEGER)
-  declare tmdbId: number | null;
-
   @Attribute(DataTypes.FLOAT)
   @Default(0)
   declare popularity: CreationOptional<number>;
@@ -87,9 +84,6 @@ export default class Stream extends Model<
 
   @Attribute(DataTypes.STRING(1024))
   declare largeCoverImage: string | null;
-
-  @Attribute(DataTypes.STRING(1024))
-  declare posterImage: string | null;
 
   @Attribute(DataTypes.JSON)
   @NotNull

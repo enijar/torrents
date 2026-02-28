@@ -14,7 +14,6 @@ const mockStreams = [
     year: 2024,
     rating: 8.0,
     largeCoverImage: "https://yts.bz/assets/images/movies/flow.jpg",
-    posterImage: null,
     torrents: [
       { hash: "low-quality", quality: "720p", videoCodec: "x264", size: 1000, seeds: 50 },
       { hash: "best-quality", quality: "1080p", videoCodec: "x264", size: 2000, seeds: 30 },

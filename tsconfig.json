@@ -20,7 +20,6 @@
     "paths": {
       "client/*": ["client/*"],
       "config/*": ["config/*"],
-      "emails/*": ["emails/*"],
       "server/*": ["server/*"]
     },
     "noEmit": true

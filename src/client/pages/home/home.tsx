@@ -16,7 +16,6 @@ interface Stream {
   year: number;
   rating: number;
   largeCoverImage: string;
-  posterImage: string | null;
   torrents: Torrent[];
 }
 
@@ -137,7 +136,7 @@ export default function Home() {
         {streams.map((stream, index) => (
           <Style.Card key={index}>
             <Link to={`/watch/${bestTorrentHash(stream.torrents)}`}>
-              <Style.Poster src={stream.posterImage ?? posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
+              <Style.Poster src={posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
               <Style.CardInfo>
                 <Style.Rating>
                   <Stars rating={stream.rating} />

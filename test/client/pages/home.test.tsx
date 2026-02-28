@@ -13,7 +13,6 @@ const mockStreams = [
     year: 2024,
     rating: 8.0,
     largeCoverImage: "https://yts.bz/assets/images/movies/test.jpg",
-    posterImage: null,
     torrents: [
       { hash: "low-hash", quality: "720p", size: 1000, seeds: 50 },
       { hash: "high-hash", quality: "1080p", size: 2000, seeds: 30 },
@@ -25,7 +24,6 @@ const mockStreams = [
     year: 2023,
     rating: 6.0,
     largeCoverImage: "https://yts.bz/assets/images/movies/another.jpg",
-    posterImage: "https://tmdb.org/poster.jpg",
     torrents: [
       { hash: "only-hash", quality: "480p", size: 500, seeds: 10 },
       { hash: "best-hash", quality: "2160p", size: 4000, seeds: 5 },
