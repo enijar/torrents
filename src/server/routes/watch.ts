@@ -62,6 +62,14 @@ app.get("/api/watch/:hash", (c) => {
       // Extend TTL
       cached.expiresAt = new Date(Date.now() + TTL_MS);
       await cached.save();
+
+      // Keep stream open until the client disconnects (es.close() in the
+      // browser's "done" handler triggers onAbort). Safety timeout prevents
+      // leaked connections if the client never closes.
+      await new Promise<void>((resolve) => {
+        stream.onAbort(() => resolve());
+        setTimeout(resolve, 30_000);
+      });
       return;
     }
 

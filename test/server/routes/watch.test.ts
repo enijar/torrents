@@ -152,8 +152,22 @@ describe("GET /api/watch/:hash", () => {
       save: vi.fn(async () => {}),
     };
 
+    // The route keeps the stream open for 30s via setTimeout so the
+    // browser can receive events before the connection closes.
+    // Intercept that specific call so the stream closes immediately.
+    const origSetTimeout = globalThis.setTimeout.bind(globalThis);
+    const spy = vi.spyOn(globalThis, "setTimeout").mockImplementation(((fn: Function, ms?: number) => {
+      if (ms === 30_000) {
+        queueMicrotask(fn as () => void);
+        return 0 as unknown as ReturnType<typeof setTimeout>;
+      }
+      return origSetTimeout(fn, ms);
+    }) as typeof setTimeout);
+
     const res = await app.request("/api/watch/cached123");
     const text = await res.text();
+    spy.mockRestore();
+
     const events = parseSSE(text);
 
     // Should have metadata and done but no progress (no download)
