@@ -3,13 +3,21 @@ import { styled } from "styled-components";
 export const Wrapper = styled.main`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 16px 16px 32px 16px;
+`;
+
+export const SearchWrapper = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #1a1a1a;
+  padding: 16px 0;
+  margin: -16px 0 0 0;
 `;
 
 export const SearchBar = styled.input`
   width: 100%;
   padding: 12px 16px;
-  margin-bottom: 24px;
   border: 1px solid #444;
   border-radius: 8px;
   background: #2a2a2a;

@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import * as Style from "client/pages/watch/watch.style.js";
 
 type Status = "downloading" | "done";
 
@@ -50,7 +51,7 @@ export default function Watch() {
 
   if (status === "downloading") {
     return (
-      <div style={{ padding: "2rem" }}>
+      <Style.Page>
         <h1>Downloading{metadata ? `: ${metadata.name}` : "..."}</h1>
         {metadata && (
           <div>
@@ -64,44 +65,29 @@ export default function Watch() {
         )}
         {progress && (
           <div>
-            <div
-              style={{
-                width: "100%",
-                height: "24px",
-                background: "#333",
-                borderRadius: "4px",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  width: `${progress.progress}%`,
-                  height: "100%",
-                  background: "#4caf50",
-                  transition: "width 0.25s",
-                }}
-              />
-            </div>
+            <Style.ProgressBarTrack>
+              <Style.ProgressBarFill $progress={progress.progress} />
+            </Style.ProgressBarTrack>
             <p>
               {progress.progress}% &middot; {progress.speed} &middot; {progress.peers} peers
             </p>
           </div>
         )}
-      </div>
+      </Style.Page>
     );
   }
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <Style.Page>
       <h1>{metadata?.name ?? "Ready"}</h1>
       {videoUrl ? (
-        <video autoPlay controls crossOrigin="anonymous" style={{ maxWidth: "100%", maxHeight: "80vh" }}>
+        <Style.Video autoPlay controls crossOrigin="anonymous">
           <source src={videoUrl} />
           {subtitleUrl && <track src={subtitleUrl} kind="subtitles" srcLang="en" label="English" default />}
-        </video>
+        </Style.Video>
       ) : (
         <p>No video file found in torrent.</p>
       )}
-    </div>
+    </Style.Page>
   );
 }

@@ -15,6 +15,7 @@ interface Stream {
   year: number;
   rating: number;
   largeCoverImage: string;
+  posterImage: string | null;
   torrents: Torrent[];
 }
 
@@ -98,17 +99,19 @@ export default function Home() {
 
   return (
     <Style.Wrapper>
-      <Style.SearchBar
-        type="text"
-        placeholder="Search movies..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <Style.SearchWrapper>
+        <Style.SearchBar
+          type="text"
+          placeholder="Search movies..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Style.SearchWrapper>
       <Style.Grid>
         {streams.map((stream) => (
           <Style.Card key={stream.uuid}>
             <Link to={`/watch/${stream.torrents[0]?.hash}`}>
-              <Style.Poster src={posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
+              <Style.Poster src={stream.posterImage ?? posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
               <Style.CardInfo>
                 <Style.Rating>
                   <Stars rating={stream.rating} />

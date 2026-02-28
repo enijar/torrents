@@ -2,6 +2,7 @@ import { serve } from "@hono/node-server";
 import database from "server/services/database.js";
 import app from "server/services/app.js";
 import config from "config/index.js";
+import { startCron } from "server/services/cron.js";
 
 try {
   await database.sync({ alter: true });
@@ -11,6 +12,7 @@ try {
   });
   server.on("listening", async () => {
     console.log(`Server running: http://localhost:${config.PORT}`);
+    startCron();
   });
 } catch (err) {
   console.error(err);

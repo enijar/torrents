@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import database from "server/services/database.js";
+import { Op } from "@sequelize/core";
+import Stream from "server/models/stream.js";
 
 const app = new Hono();
 
@@ -8,18 +9,39 @@ app.get("/api/streams", async (c) => {
   const offset = parseInt(c.req.query("offset") ?? "0", 10) || 0;
   const limit = 20;
 
-  let where = "WHERE year <= 2026 AND rating > 0 AND seeds > 0";
-  const replacements: Record<string, string | number> = { limit, offset };
+  const where: Record<string, unknown> = {
+    year: { [Op.lte]: 2026 },
+    rating: { [Op.gt]: 0 },
+    seeds: { [Op.gt]: 0 },
+  };
 
   if (search.trim()) {
-    where += " AND title LIKE :search";
-    replacements.search = `%${search.trim()}%`;
+    where.title = { [Op.like]: `%${search.trim()}%` };
   }
 
-  const [streams] = await database.query(
-    `SELECT * FROM streams ${where} ORDER BY popularity DESC, rating DESC, year DESC LIMIT :limit OFFSET :offset`,
-    { replacements },
-  );
+  const streams = await Stream.findAll({
+    attributes: [
+      "uuid",
+      "apiId",
+      "title",
+      "year",
+      "rating",
+      "genres",
+      "largeCoverImage",
+      "posterImage",
+      "torrents",
+      "seeds",
+      "popularity",
+    ],
+    where,
+    order: [
+      ["popularity", "DESC"],
+      ["rating", "DESC"],
+      ["year", "DESC"],
+    ],
+    limit,
+    offset,
+  });
 
   return c.json({
     streams,

@@ -25,6 +25,7 @@
     "@sequelize/sqlite3": "7.0.0-alpha.48",
     "dotenv": "17.3.1",
     "hono": "4.12.0",
+    "node-cron": "^4.2.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-router-dom": "7.13.0",
@@ -36,7 +37,9 @@
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.6",
+    "@types/create-torrent": "6.1.1",
     "@types/node": "25.3.0",
+    "@types/node-cron": "^3.0.11",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/webtorrent": "0.110.1",
