@@ -2,11 +2,9 @@ import { fetch as undiciFetch } from "undici";
 import { z } from "zod/v4";
 import agent from "server/services/agent.js";
 import Stream from "server/models/stream.js";
-import { Op } from "@sequelize/core";
 import {
   downloadTMDbExport,
   findMovieInExport,
-  fetchPostersInBatches,
 } from "server/services/tmdb-export.js";
 
 const TorrentSchema = z.object({
@@ -113,30 +111,6 @@ export default async function updateStreams(): Promise<void> {
   }
 
   console.log(`[update-streams] Done. ${upserted} streams upserted.`);
-
-  // Fetch TMDb posters for streams that have a tmdbId but no poster yet
-  const needPosters = await Stream.findAll({
-    attributes: ["uuid", "tmdbId"],
-    where: {
-      tmdbId: { [Op.ne]: null },
-      posterImage: { [Op.eq]: null },
-    },
-  });
-
-  if (needPosters.length > 0) {
-    console.log(
-      `[update-streams] Fetching TMDb posters for ${needPosters.length} streams...`,
-    );
-    const fetched = await fetchPostersInBatches(
-      needPosters.map((s) => ({ uuid: s.uuid, tmdbId: s.tmdbId! })),
-      async (uuid, posterUrl) => {
-        await Stream.update({ posterImage: posterUrl }, { where: { uuid } });
-      },
-    );
-    console.log(`[update-streams] ${fetched} posters saved.`);
-  } else {
-    console.log("[update-streams] All streams already have posters.");
-  }
 }
 
 async function processMovies(

@@ -40,6 +40,21 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
+const QUALITY_RANK: Record<string, number> = {
+  "2160p": 4,
+  "1080p": 3,
+  "720p": 2,
+  "480p": 1,
+  "3D": 0,
+};
+
+function bestTorrentHash(torrents: Torrent[]): string | undefined {
+  if (torrents.length === 0) return undefined;
+  return torrents.reduce((best, t) =>
+    (QUALITY_RANK[t.quality] ?? -1) > (QUALITY_RANK[best.quality] ?? -1) ? t : best
+  ).hash;
+}
+
 function posterSrc(largeCoverImage: string): string {
   try {
     const { pathname } = new URL(largeCoverImage);
@@ -110,7 +125,7 @@ export default function Home() {
       <Style.Grid>
         {streams.map((stream) => (
           <Style.Card key={stream.uuid}>
-            <Link to={`/watch/${stream.torrents[0]?.hash}`}>
+            <Link to={`/watch/${bestTorrentHash(stream.torrents)}`}>
               <Style.Poster src={stream.posterImage ?? posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
               <Style.CardInfo>
                 <Style.Rating>
