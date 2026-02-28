@@ -129,7 +129,10 @@ export default function Home() {
           type="text"
           placeholder="Search movies..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            window.scrollTo(0, 0);
+          }}
         />
       </Style.SearchWrapper>
       <Style.Grid>
