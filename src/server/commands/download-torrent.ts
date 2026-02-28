@@ -6,7 +6,7 @@ export default async function downloadTorrent(hash?: string) {
     process.exit(1);
   }
   const torrentService = new TorrentService();
-  torrentService.on<{ name: string; files: string[] }>("metadata", (info) => {
+  torrentService.on<{ name: string; files: { name: string; path: string }[] }>("metadata", (info) => {
     console.log("[metadata]", info)
   });
   torrentService.on<{ progress: number; speed: string; peers: number }>("progress", (info) => {

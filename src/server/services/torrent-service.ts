@@ -20,6 +20,11 @@ export default class TorrentService {
     this.events.set(event, fns);
   }
 
+  destroy() {
+    if (this.interval) clearInterval(this.interval);
+    this.client.destroy();
+  }
+
   download(hash: string) {
     return new Promise((resolve, reject) => {
       const torrent = this.client.add(`magnet:?xt=urn:btih:${hash}`, {
@@ -33,7 +38,7 @@ export default class TorrentService {
       torrent.on("metadata", () => {
         this.emit("metadata", {
           name: torrent.name,
-          files: torrent.files.map((file) => file.name),
+          files: torrent.files.map((file) => ({ name: file.name, path: file.path })),
         });
       });
       torrent.on("ready", () => {

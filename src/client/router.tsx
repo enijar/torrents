@@ -13,6 +13,10 @@ export const router = createRouter([
         path: "/",
         Component: React.lazy(() => import("client/pages/home/home.js")),
       },
+      {
+        path: "/watch/:hash",
+        Component: React.lazy(() => import("client/pages/watch/watch.js")),
+      },
     ],
   },
 ]);
