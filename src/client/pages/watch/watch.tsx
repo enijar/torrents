@@ -95,7 +95,7 @@ export default function Watch() {
     <div style={{ padding: "2rem" }}>
       <h1>{metadata?.name ?? "Ready"}</h1>
       {videoUrl ? (
-        <video controls crossOrigin="anonymous" style={{ maxWidth: "100%", maxHeight: "80vh" }}>
+        <video autoPlay controls crossOrigin="anonymous" style={{ maxWidth: "100%", maxHeight: "80vh" }}>
           <source src={videoUrl} />
           {subtitleUrl && <track src={subtitleUrl} kind="subtitles" srcLang="en" label="English" default />}
         </video>

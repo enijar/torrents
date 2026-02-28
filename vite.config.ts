@@ -10,13 +10,14 @@ const SERVER_URL = `http://localhost:${config.PORT}`;
 export default function (): UserConfig {
   return defineConfig({
     server: {
-      port: 8080,
+      port: parseInt(new URL(config.APP_URL).port),
       host: true,
       proxy: {
         "/api": {
           target: SERVER_URL,
         },
       },
+      allowedHosts: ["jamess-mac-pro.local"],
     },
     base: config.BASE_PATH,
     publicDir: path.join(import.meta.dirname, "public"),
