@@ -35,6 +35,63 @@ export const SearchBar = styled.input`
   }
 `;
 
+export const GenreBarWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 4px 0;
+`;
+
+export const GenreBar = styled.div`
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  min-width: 0;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+export const ScrollArrow = styled.button`
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #444;
+  border-radius: 50%;
+  background: #2a2a2a;
+  color: #ccc;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #f5c518;
+    background: #f5c518;
+    color: #000;
+  }
+`;
+
+export const GenreChip = styled.button<{ $active: boolean }>`
+  flex-shrink: 0;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid ${(p) => (p.$active ? "#f5c518" : "#444")};
+  background: ${(p) => (p.$active ? "#f5c518" : "transparent")};
+  color: ${(p) => (p.$active ? "#000" : "#ccc")};
+
+  &:hover {
+    border-color: #f5c518;
+  }
+`;
+
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);

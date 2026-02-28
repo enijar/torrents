@@ -25,8 +25,15 @@ beforeEach(() => {
   MockEventSource.instances = [];
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({
-      json: () => Promise.resolve({ streams: mockStreams, offset: null }),
+    vi.fn((url: string) => {
+      if (url.startsWith("/api/genres")) {
+        return Promise.resolve({
+          json: () => Promise.resolve({ genres: [] }),
+        });
+      }
+      return Promise.resolve({
+        json: () => Promise.resolve({ streams: mockStreams, offset: null }),
+      });
     }),
   );
   vi.stubGlobal(

@@ -74,6 +74,35 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [selectedGenre, setSelectedGenre] = useState("");
+  const genreBarRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollArrows = useCallback(() => {
+    const el = genreBarRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  const scrollGenres = useCallback((direction: "left" | "right") => {
+    const el = genreBarRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === "left" ? -el.clientWidth : el.clientWidth });
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/genres")
+      .then((res) => res.json())
+      .then((data) => setGenres(data.genres))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    updateScrollArrows();
+  }, [genres, updateScrollArrows]);
 
   const fetchStreams = useCallback(
     async (currentOffset: number, replace: boolean) => {
@@ -86,6 +115,7 @@ export default function Home() {
       try {
         const params = new URLSearchParams({ offset: String(currentOffset) });
         if (debouncedSearch) params.set("search", debouncedSearch);
+        if (selectedGenre) params.set("genre", selectedGenre);
         const res = await fetch(`/api/streams?${params}`, { signal });
         const data = await res.json();
         setStreams((prev) => (replace ? data.streams : [...prev, ...data.streams]));
@@ -97,13 +127,13 @@ export default function Home() {
         setLoading(false);
       }
     },
-    [debouncedSearch],
+    [debouncedSearch, selectedGenre],
   );
 
   useEffect(() => {
     setOffset(0);
     fetchStreams(0, true);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, selectedGenre]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -134,6 +164,37 @@ export default function Home() {
             window.scrollTo(0, 0);
           }}
         />
+        <Style.GenreBarWrapper>
+          {canScrollLeft && (
+            <Style.ScrollArrow onClick={() => scrollGenres("left")}>&#8249;</Style.ScrollArrow>
+          )}
+          <Style.GenreBar ref={genreBarRef} onScroll={updateScrollArrows}>
+            <Style.GenreChip
+              $active={selectedGenre === ""}
+              onClick={() => {
+                setSelectedGenre("");
+                window.scrollTo(0, 0);
+              }}
+            >
+              All
+            </Style.GenreChip>
+            {genres.map((genre) => (
+              <Style.GenreChip
+                key={genre}
+                $active={selectedGenre === genre}
+                onClick={() => {
+                  setSelectedGenre((prev) => (prev === genre ? "" : genre));
+                  window.scrollTo(0, 0);
+                }}
+              >
+                {genre}
+              </Style.GenreChip>
+            ))}
+          </Style.GenreBar>
+          {canScrollRight && (
+            <Style.ScrollArrow onClick={() => scrollGenres("right")}>&#8250;</Style.ScrollArrow>
+          )}
+        </Style.GenreBarWrapper>
       </Style.SearchWrapper>
       <Style.Grid>
         {streams.map((stream, index) => (
