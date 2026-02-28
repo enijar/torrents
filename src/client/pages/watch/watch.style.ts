@@ -22,4 +22,8 @@ export const ProgressBarFill = styled.div<{ $progress: number }>`
 export const Video = styled.video`
   max-width: 100%;
   max-height: 80vh;
+
+  &:focus {
+    outline: none;
+  }
 `;
