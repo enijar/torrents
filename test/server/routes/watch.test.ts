@@ -34,7 +34,25 @@ vi.mock("server/services/torrent-service.js", () => {
   };
 });
 
+let mockCachedEntry: {
+  hash: string;
+  name: string;
+  files: { name: string; path: string }[];
+  expiresAt: Date;
+  save: ReturnType<typeof vi.fn>;
+} | null = null;
+
+vi.mock("server/models/cached-stream.js", () => {
+  return {
+    default: {
+      findOne: vi.fn(async () => mockCachedEntry),
+      upsert: vi.fn(async () => {}),
+    },
+  };
+});
+
 import app from "server/routes/watch.js";
+import CachedStream from "server/models/cached-stream.js";
 
 function parseSSE(text: string) {
   const events: { event: string; data: unknown }[] = [];
@@ -58,6 +76,9 @@ describe("GET /api/watch/:hash", () => {
       { name: "test.mp4", path: "Test Movie/test.mp4" },
       { name: "english.srt", path: "Test Movie/english.srt" },
     ];
+    mockCachedEntry = null;
+    vi.mocked(CachedStream.findOne).mockClear();
+    vi.mocked(CachedStream.upsert).mockClear();
   });
 
   it("streams metadata, progress, and done SSE events", async () => {
@@ -117,5 +138,51 @@ describe("GET /api/watch/:hash", () => {
     const done = events.find((e) => e.event === "done");
     const doneData = done!.data as { videoUrl: string; subtitleUrl: string | null };
     expect(doneData.videoUrl).toBe("/api/files/Test%20Movie/movie.mkv");
+  });
+
+  it("serves cached stream immediately without downloading", async () => {
+    mockCachedEntry = {
+      hash: "cached123",
+      name: "Cached Movie",
+      files: [
+        { name: "movie.mp4", path: "Cached Movie/movie.mp4" },
+        { name: "english.srt", path: "Cached Movie/english.srt" },
+      ],
+      expiresAt: new Date(Date.now() + 86400000),
+      save: vi.fn(async () => {}),
+    };
+
+    const res = await app.request("/api/watch/cached123");
+    const text = await res.text();
+    const events = parseSSE(text);
+
+    // Should have metadata and done but no progress (no download)
+    expect(events.find((e) => e.event === "metadata")).toBeDefined();
+    expect(events.find((e) => e.event === "done")).toBeDefined();
+    expect(events.find((e) => e.event === "progress")).toBeUndefined();
+
+    const done = events.find((e) => e.event === "done");
+    const doneData = done!.data as { videoUrl: string; subtitleUrl: string };
+    expect(doneData.videoUrl).toBe("/api/files/Cached%20Movie/movie.mp4");
+    expect(doneData.subtitleUrl).toBe("/api/files/Cached%20Movie/english.srt");
+
+    // TTL should have been extended
+    expect(mockCachedEntry.save).toHaveBeenCalled();
+  });
+
+  it("downloads fresh when cache entry is expired", async () => {
+    // findOne returns null for expired entries (the WHERE clause filters them)
+    mockCachedEntry = null;
+
+    const res = await app.request("/api/watch/expired123");
+    const text = await res.text();
+    const events = parseSSE(text);
+
+    // Should have progress (downloaded fresh)
+    expect(events.find((e) => e.event === "progress")).toBeDefined();
+    expect(events.find((e) => e.event === "done")).toBeDefined();
+
+    // Should upsert cache after download
+    expect(CachedStream.upsert).toHaveBeenCalled();
   });
 });
