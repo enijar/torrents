@@ -24,6 +24,7 @@ const config = z
     DATABASE_DIALECT: z.enum(["sqlite3", "mysql"]),
     DATABASE_URL: z.string().nonempty(),
     BASE_PATH: z.string().nonempty(),
+    TMDB_API_KEY: z.string().nonempty(),
     PROXY_HOST: z.string().nonempty(),
     PROXY_PORT: z.coerce.number(),
     PROXY_USERNAME: z.string().nonempty(),
