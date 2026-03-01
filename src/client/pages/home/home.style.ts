@@ -15,9 +15,14 @@ export const SearchWrapper = styled.div`
   margin: -16px 0 0 0;
 `;
 
+export const SearchBarWrapper = styled.div`
+  position: relative;
+`;
+
 export const SearchBar = styled.input`
   width: 100%;
   padding: 12px 16px;
+  padding-right: 40px;
   border: 1px solid #444;
   border-radius: 8px;
   background: #2a2a2a;
@@ -32,6 +37,30 @@ export const SearchBar = styled.input`
 
   &:focus {
     border-color: #f5c518;
+  }
+`;
+
+export const ClearButton = styled.button`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: #555;
+  color: #ddd;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: #777;
   }
 `;
 
@@ -127,6 +156,12 @@ export const Poster = styled.img`
   aspect-ratio: 2 / 3;
   object-fit: cover;
   display: block;
+  background: #333;
+`;
+
+export const PosterPlaceholder = styled.div`
+  width: 100%;
+  aspect-ratio: 2 / 3;
   background: #333;
 `;
 

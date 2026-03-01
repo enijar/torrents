@@ -15,7 +15,7 @@ interface Stream {
   title: string;
   year: number;
   rating: number;
-  largeCoverImage: string;
+  posterUrl: string | null;
   torrents: Torrent[];
 }
 
@@ -55,15 +55,6 @@ function bestTorrentHash(torrents: Torrent[]): string | undefined {
   return pool.reduce((best, t) =>
     (QUALITY_RANK[t.quality] ?? -1) > (QUALITY_RANK[best.quality] ?? -1) ? t : best
   ).hash;
-}
-
-function posterSrc(largeCoverImage: string): string {
-  try {
-    const { pathname } = new URL(largeCoverImage);
-    return `/api/yts-proxy${pathname}`;
-  } catch {
-    return largeCoverImage;
-  }
 }
 
 export default function Home() {
@@ -155,15 +146,22 @@ export default function Home() {
   return (
     <Style.Wrapper>
       <Style.SearchWrapper>
-        <Style.SearchBar
-          type="text"
-          placeholder="Search movies..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            window.scrollTo(0, 0);
-          }}
-        />
+        <Style.SearchBarWrapper>
+          <Style.SearchBar
+            type="text"
+            placeholder="Search movies..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              window.scrollTo(0, 0);
+            }}
+          />
+          {search && (
+            <Style.ClearButton onClick={() => { setSearch(""); window.scrollTo(0, 0); }}>
+              ✕
+            </Style.ClearButton>
+          )}
+        </Style.SearchBarWrapper>
         <Style.GenreBarWrapper>
           {canScrollLeft && (
             <Style.ScrollArrow onClick={() => scrollGenres("left")}>&#8249;</Style.ScrollArrow>
@@ -200,7 +198,7 @@ export default function Home() {
         {streams.map((stream, index) => (
           <Style.Card key={index}>
             <Link to={`/watch/${bestTorrentHash(stream.torrents)}`}>
-              <Style.Poster src={posterSrc(stream.largeCoverImage)} alt={stream.title} loading="lazy" />
+              {stream.posterUrl ? <Style.Poster src={stream.posterUrl} alt={stream.title} loading="lazy" /> : <Style.PosterPlaceholder />}
               <Style.CardInfo>
                 <Style.Rating>
                   <Stars rating={stream.rating} />
