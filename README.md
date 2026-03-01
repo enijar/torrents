@@ -8,7 +8,7 @@ Movies are fetched from the YTS catalog, ranked by TMDb popularity, and searchab
 
 - Node.js 20+
 - A [NordVPN](https://nordvpn.com) subscription (for the SOCKS5 proxy)
-- A [TMDb](https://www.themoviedb.org) account (optional, for popularity ranking)
+- A [TMDb](https://www.themoviedb.org) API read access token (for popularity ranking and poster images)
 
 ## Setup
 
@@ -24,6 +24,7 @@ PORT=3900
 APP_URL=http://localhost:8900
 DATABASE_DIALECT=sqlite3
 DATABASE_URL=sqlite3:database.sqlite
+TMDB_API_KEY=your-tmdb-read-access-token
 BASE_PATH=/
 PROXY_HOST=amsterdam.nl.socks.nordhold.net
 PROXY_PORT=1080
@@ -40,9 +41,13 @@ All outbound requests to YTS are routed through a SOCKS5 proxy to bypass regiona
 3. Choose a server hostname from [NordVPN's server list](https://nordvpn.com/servers/tools/). The hostname format is `hostname.nordhold.net` and the port is `1080`.
 4. Set `PROXY_HOST`, `PROXY_PORT`, `PROXY_USERNAME`, and `PROXY_PASSWORD` in `.env.local`.
 
-### TMDb Popularity Data
+### TMDb API Key
 
-The app downloads a daily export from TMDb to rank movies by popularity. This works without an API key — the export is a public gzipped file. No TMDb configuration is needed. If the export is unavailable, movies fall back to a popularity of 0 and are sorted by rating instead.
+The app uses the TMDb API to fetch poster images and downloads a daily export to rank movies by popularity. A read access token is required.
+
+1. Create an account at [themoviedb.org](https://www.themoviedb.org).
+2. Go to **Settings** > **API** and copy your **API Read Access Token** (the long JWT, not the shorter API key).
+3. Set `TMDB_API_KEY` in `.env.local`.
 
 ## Development
 
