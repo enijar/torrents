@@ -1,6 +1,8 @@
 import { fetch as undiciFetch } from "undici";
 import { z } from "zod/v4";
+import { Op } from "@sequelize/core";
 import agent from "server/services/agent.js";
+import config from "config/index.js";
 import Stream from "server/models/stream.js";
 import {
   downloadTMDbExport,
@@ -112,6 +114,79 @@ export default async function updateStreams(): Promise<void> {
   }
 
   console.log(`[update-streams] Done. ${upserted} streams upserted.`);
+
+  await resolvePosters();
+}
+
+const POSTER_BATCH_SIZE = 40;
+const POSTER_RATE_WINDOW_MS = 10_000;
+
+async function resolvePosters(): Promise<void> {
+  const streams = await Stream.findAll({
+    where: {
+      posterUrl: { [Op.is]: null },
+      imdbCode: { [Op.not]: null },
+    },
+    attributes: ["uuid", "imdbCode"],
+  });
+
+  if (streams.length === 0) {
+    console.log("[update-streams] All streams already have poster URLs.");
+    return;
+  }
+
+  console.log(
+    `[update-streams] Resolving posters for ${streams.length} streams...`,
+  );
+
+  const batches = chunk(streams, POSTER_BATCH_SIZE);
+  let resolved = 0;
+
+  for (let i = 0; i < batches.length; i++) {
+    const batch = batches[i];
+    const batchStart = Date.now();
+
+    await Promise.all(
+      batch.map(async (stream) => {
+        try {
+          const res = await fetch(
+            `https://api.themoviedb.org/3/find/${stream.imdbCode}?external_source=imdb_id`,
+            {
+              headers: {
+                Authorization: `Bearer ${config.TMDB_API_KEY}`,
+              },
+            },
+          );
+          if (!res.ok) return;
+          const data = await res.json();
+          const backdropPath = data?.movie_results?.[0]?.poster_path;
+          if (backdropPath) {
+            await Stream.update(
+              { posterUrl: `https://image.tmdb.org/t/p/w500${backdropPath}` },
+              { where: { uuid: stream.uuid } },
+            );
+            resolved++;
+          }
+        } catch {
+          // skip failed lookups; will retry next run
+        }
+      }),
+    );
+
+    console.log(
+      `[update-streams] Posters: batch ${i + 1}/${batches.length} done (${resolved} resolved)`,
+    );
+
+    if (i < batches.length - 1) {
+      const elapsed = Date.now() - batchStart;
+      const remaining = POSTER_RATE_WINDOW_MS - elapsed;
+      if (remaining > 0) {
+        await new Promise((r) => setTimeout(r, remaining));
+      }
+    }
+  }
+
+  console.log(`[update-streams] Poster resolution complete. ${resolved} resolved.`);
 }
 
 async function processMovies(

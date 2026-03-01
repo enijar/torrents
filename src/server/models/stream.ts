@@ -85,6 +85,9 @@ export default class Stream extends Model<
   @Attribute(DataTypes.STRING(1024))
   declare largeCoverImage: string | null;
 
+  @Attribute(DataTypes.STRING(1024))
+  declare posterUrl: string | null;
+
   @Attribute(DataTypes.JSON)
   @NotNull
   declare torrents: TorrentData[];

@@ -47,6 +47,7 @@ app.get("/api/streams", async (c) => {
       "rating",
       "genres",
       "largeCoverImage",
+      "posterUrl",
       "torrents",
       "seeds",
       "popularity",
