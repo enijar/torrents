@@ -24,7 +24,7 @@ app.get("/api/streams", async (c) => {
   const limit = 20;
 
   const where: Record<string | symbol, unknown> = {
-    year: { [Op.lte]: 2026 },
+    year: { [Op.lte]: new Date().getFullYear() },
     rating: { [Op.gt]: 0 },
     seeds: { [Op.gt]: 0 },
   };
