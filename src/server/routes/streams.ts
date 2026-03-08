@@ -25,8 +25,6 @@ app.get("/api/streams", async (c) => {
 
   const where: Record<string | symbol, unknown> = {
     year: { [Op.lte]: new Date().getFullYear() },
-    rating: { [Op.gt]: 0 },
-    seeds: { [Op.gt]: 0 },
   };
 
   if (search.trim()) {
