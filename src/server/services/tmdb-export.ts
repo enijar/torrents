@@ -17,6 +17,10 @@ function normalizeTitle(title: string): string {
     .trim();
 }
 
+function yieldToEventLoop(): Promise<void> {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
 function getTodayDateString(): string {
   const d = new Date();
   const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
@@ -44,7 +48,9 @@ export async function downloadTMDbExport(): Promise<TMDbMap> {
   const raw = await text(gunzip);
 
   const map: TMDbMap = new Map();
-  for (const line of raw.split("\n")) {
+  const lines = raw.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     if (!line.trim()) continue;
     try {
       const entry = JSON.parse(line);
@@ -57,6 +63,7 @@ export async function downloadTMDbExport(): Promise<TMDbMap> {
     } catch {
       // skip malformed lines
     }
+    if (i % 5000 === 0) await yieldToEventLoop();
   }
 
   console.log(`[tmdb-export] Loaded ${map.size} entries`);

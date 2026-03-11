@@ -14,8 +14,8 @@ export function startCron() {
     }
   });
 
-  // Every hour
-  schedule("0 * * * *", async () => {
+  // Every hour (at :30 to avoid collision with update-streams at :00)
+  schedule("30 * * * *", async () => {
     console.log("[cron: start] cleanup-cache");
     try {
       await cleanupCache();

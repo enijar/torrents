@@ -193,12 +193,11 @@ async function processMovies(
   movies: z.infer<typeof MovieSchema>[],
   tmdbMap: Awaited<ReturnType<typeof downloadTMDbExport>>,
 ): Promise<number> {
-  let count = 0;
-  for (const movie of movies) {
+  const records = movies.map((movie) => {
     const tmdb = findMovieInExport(tmdbMap, movie.title);
     const maxSeeds = Math.max(0, ...movie.torrents.map((t) => t.seeds));
 
-    await Stream.upsert({
+    return {
       apiId: movie.id,
       popularity: tmdb?.popularity ?? 0,
       title: movie.title,
@@ -218,8 +217,25 @@ async function processMovies(
         seeds: t.seeds,
       })),
       seeds: maxSeeds,
-    });
-    count++;
-  }
-  return count;
+    };
+  });
+
+  await Stream.bulkCreate(records, {
+    updateOnDuplicate: [
+      "popularity",
+      "title",
+      "year",
+      "rating",
+      "duration",
+      "genres",
+      "synopsis",
+      "youTubeTrailerCode",
+      "imdbCode",
+      "largeCoverImage",
+      "torrents",
+      "seeds",
+    ],
+  });
+
+  return records.length;
 }
