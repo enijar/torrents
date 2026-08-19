@@ -5,7 +5,7 @@ type Events = "metadata" | "progress" | "done";
 type Fn<T = any> = (...args: T[]) => any;
 
 export default class TorrentService {
-  private readonly client = new WebTorrent();
+  private readonly client = new WebTorrent({ utp: false });
   private events = new Map<Events, Fn[]>();
   private interval: ReturnType<typeof setInterval> | null = null;
 
