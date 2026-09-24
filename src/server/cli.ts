@@ -17,7 +17,7 @@ try {
   }
   await database.sync({ alter: true });
   const args = process.argv.slice(3);
-  await exec(...args);
+  await exec(args);
   process.exit(0);
 } catch (err) {
   console.log(err);

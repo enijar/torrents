@@ -69,7 +69,9 @@ async function fetchPage(page: number): Promise<z.infer<typeof APIResponseSchema
   }
 }
 
-export default async function updateStreams(): Promise<void> {
+type Args = [];
+
+export default async function updateStreams([]: Args): Promise<void> {
   console.log("[update-streams] Starting...");
 
   const tmdbMap = await downloadTMDbExport();

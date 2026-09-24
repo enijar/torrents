@@ -1,6 +1,8 @@
 import TorrentService from "server/services/torrent-service.js";
 
-export default async function downloadTorrent(hash?: string) {
+type Args = [hash?: string];
+
+export default async function downloadTorrent([hash]: Args) {
   if (!hash) {
     console.error("Usage: download-torrent <hash>");
     process.exit(1);
