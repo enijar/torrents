@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "node:fs";
-import { config as dotenv } from "@dotenvx/dotenvx";
+import dotenvx from "@dotenvx/dotenvx";
 import { z } from "zod/v4";
 
 const envFiles = {
@@ -11,10 +11,10 @@ const envFiles = {
 let envFile = process.env.NODE_ENV === "development" ? envFiles.dev : envFiles.prod;
 let env = {};
 if (fs.existsSync(envFile)) {
-  env = dotenv({ path: envFile, quiet: true }).parsed ?? {};
+  env = dotenvx.config({ path: envFile, quiet: true }).parsed ?? {};
 }
 if (fs.existsSync(envFiles.local)) {
-  env = { ...env, ...(dotenv({ path: envFiles.local, quiet: true, override: true }).parsed ?? {}) };
+  env = { ...env, ...(dotenvx.config({ path: envFiles.local, quiet: true, override: true }).parsed ?? {}) };
 }
 
 const config = z

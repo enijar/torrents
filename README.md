@@ -6,7 +6,8 @@ Movies are fetched from the YTS catalog, ranked by TMDb popularity, and searchab
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 26.10+ (26.x; use `nvm install` and `nvm use` with the included `.nvmrc`)
+- npm 11.19.1+
 - A [NordVPN](https://nordvpn.com) subscription (for the SOCKS5 proxy)
 - A [TMDb](https://www.themoviedb.org) API read access token (for popularity ranking and poster images)
 
@@ -14,7 +15,7 @@ Movies are fetched from the YTS catalog, ranked by TMDb popularity, and searchab
 
 ```shell
 cp .env.example .env.local
-npm install
+npm ci
 ```
 
 Edit `.env.local` with your values:
@@ -141,6 +142,10 @@ npm run check       # TypeScript type check
 ```
 
 ## Database
+
+The `@sequelize/*` packages remain pinned to `7.0.0-alpha.48`, their latest published release. These packages do not yet have a stable release.
+
+The SQLite driver is pinned to `sqlite3@6.0.1` through a scoped npm override to remove vulnerable build dependencies in the default 5.x driver. Keep this override until `@sequelize/sqlite3` supports 6.x directly. Database integration tests cover JSON data, upserts, expiry dates, schema sync, and transaction rollback.
 
 SQLite is the default. To use MySQL instead, update your `.env.local`:
 

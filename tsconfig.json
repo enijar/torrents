@@ -16,11 +16,10 @@
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "baseUrl": "./src",
     "paths": {
-      "client/*": ["client/*"],
-      "config/*": ["config/*"],
-      "server/*": ["server/*"]
+      "client/*": ["./src/client/*"],
+      "config/*": ["./src/config/*"],
+      "server/*": ["./src/server/*"]
     },
     "noEmit": true
   },
